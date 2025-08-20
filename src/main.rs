@@ -14,7 +14,7 @@ struct Item {
 
 
 fn main() {
-    let manticore_pool = Pool::new("mysql://root:@192.168.0.211:9306/Manticore?reset_connection=false").unwrap();
+    let manticore_pool = Pool::new("mysql://root:@172.21.162.118:9306/Manticore?reset_connection=false").unwrap();
 
     let mut conn = manticore_pool.get_conn().unwrap();
 
@@ -28,9 +28,9 @@ fn main() {
             scroll=val;
         }
 
-        let mut sql:String="select id,keyword from req_log where sp_id='200002' and req_date>='2025-07-01' and req_date<'2025-08-01' order by id asc limit 10000; ".to_string();
+        let mut sql:String="select id,keyword from req_log where sp_id='200002' and req_date>='2025-07-01' and req_date<'2025-08-01' order by id asc limit 1000".to_string();
         if scroll.len()>0{
-            sql.push_str(&scroll);
+            sql.push_str(format!(" OPTION scroll='{}'",scroll.as_str()).as_str());
         }
 
         let items = conn.query_map(sql, |(id, keyword)| {
