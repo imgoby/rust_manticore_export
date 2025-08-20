@@ -24,14 +24,17 @@ fn main() {
     loop {
         let mut scroll:String="".to_string();
         if let Some(val) = conn.query_first::<String,&str>("SHOW SCROLL;").unwrap(){
-            print!("{}",scroll);
+            println!("{}",&val);
             scroll=val;
         }
 
-        let mut sql:String="select id,keyword from req_log where sp_id='200002' and req_date>='2025-07-01' and req_date<'2025-08-01' order by id asc limit 1000".to_string();
+        let mut sql:String="select id,keyword from req_log where sp_id='200002' and req_time>=1751299200 and req_time<1753977600 ".to_string();
         if scroll.len()>0{
-            sql.push_str(format!(" OPTION scroll='{}'",scroll.as_str()).as_str());
+            sql.push_str(format!("limit 1000 OPTION scroll='{}' ",scroll.as_str()).as_str());
+        }else{
+            sql.push_str("order by id asc limit 1000");
         }
+         println!("sql:{}",&sql);
 
         let items = conn.query_map(sql, |(id, keyword)| {
             Item {
